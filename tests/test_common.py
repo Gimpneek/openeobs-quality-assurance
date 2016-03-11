@@ -1,28 +1,40 @@
+"""Sets up and tears down a test class"""
 import unittest
 from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as ec
 import selenium.webdriver.support.ui as ui
 from selenium.webdriver.common.by import By
 from erppeek import Client
+from tests.environment import DATABASE, DESKTOP_URL, ODOO_CLIENT_URL, \
+    TEST_DB_NAME, USERNAME, PASSWORD
 
 
 class TestCommon(unittest.TestCase):
+    """Setup and teardown methods"""
 
     @classmethod
     def setUpClass(cls):
+        database = DATABASE
+        url = DESKTOP_URL
+        odoo_client_url = ODOO_CLIENT_URL
+        test_db = TEST_DB_NAME
+        username = USERNAME
+        password = PASSWORD
+
         cls.driver = webdriver.Firefox()
-        cls.driver.get('http://localhost:8069/web?db=mobile_qa_db')
+        cls.driver.get(url)
         ui.WebDriverWait(cls.driver, 5).until(
-            ec.visibility_of_element_located(
-                    (By.CSS_SELECTOR,
-                     '.oe_single_form_container.modal-content')
-            )
+            ec.visibility_of_element_located((By.CSS_SELECTOR,
+                                              '.oe_single_form_container.'
+                                              'modal-content'))
         )
-        cls.odoo_client = Client('http://localhost:8069', db='mobile_qa_db',
-                                 user='admin', password='admin')
-        cls.test_database_name = 'openeobs_quality_assurance_db'
+        cls.odoo_client = Client(odoo_client_url, db=database,
+                                 user=username, password=password)
+
+        cls.test_database_name = test_db
+
         cls.odoo_client.db.drop('admin', cls.test_database_name)
-        cls.odoo_client.db.duplicate_database('admin', 'mobile_qa_db',
+        cls.odoo_client.db.duplicate_database('admin', database,
                                               cls.test_database_name)
 
     @classmethod

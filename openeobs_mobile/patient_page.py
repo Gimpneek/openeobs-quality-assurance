@@ -1,10 +1,17 @@
-from openeobs_selenium.page_helpers import BasePage, PatientPageLocators, \
-    TaskPageLocators
+"""Methods for the patient page"""
+
+from openeobs_mobile.page_helpers import BasePage
+from openeobs_mobile.task_page_locators import TASK_FORM_SUBMIT, TASK_FORM
+from openeobs_mobile.patient_page_locators import ADHOC_OBS_MENU_BUTTON, \
+    OPEN_OBS_MENU, GRAPH_CHART, TABLE_TAB_BUTTON, GRAPH_TAB_BUTTON, \
+    GRAPH_CHART_SVG, TABULAR_VALUES_TABLE, TABLE_CONTAINER, TABLE_DATA, \
+    TABLE_ROW, TABLE_HEADER
 import selenium.webdriver.support.expected_conditions as ec
 import selenium.webdriver.support.ui as ui
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
+
 
 class PatientPage(BasePage):
     """
@@ -16,13 +23,13 @@ class PatientPage(BasePage):
         Open up the adhoc observation menu
         """
         obs_button = self.driver.find_element(
-            *PatientPageLocators.adhoc_obs_menu_button
+            *ADHOC_OBS_MENU_BUTTON
         )
         obs_button.click()
         ui.WebDriverWait(self.driver, 5).until(
             ec.visibility_of_element_located((By.ID, 'obs_menu'))
         )
-        return self.driver.find_element(*PatientPageLocators.open_obs_menu)
+        return self.driver.find_element(*OPEN_OBS_MENU)
 
     def adhoc_obs_menu_is_open(self):
         """
@@ -31,7 +38,7 @@ class PatientPage(BasePage):
         """
         try:
             self.driver.find_element(
-                *PatientPageLocators.open_obs_menu
+                *OPEN_OBS_MENU
             )
         except NoSuchElementException:
             return False
@@ -42,7 +49,7 @@ class PatientPage(BasePage):
         Check that the patient's record shows data
         :return: Boolean if error message is shown or not
         """
-        chart = self.driver.find_element(*PatientPageLocators.graph_chart)
+        chart = self.driver.find_element(*GRAPH_CHART)
         return chart.text == 'No observation data available for patient'
 
     def tabs_are_shown(self):
@@ -52,10 +59,10 @@ class PatientPage(BasePage):
         """
         try:
             self.driver.find_element(
-                *PatientPageLocators.table_tab_button
+                *TABLE_TAB_BUTTON
             )
             self.driver.find_element(
-                *PatientPageLocators.graph_tab_button
+                *GRAPH_TAB_BUTTON
             )
         except NoSuchElementException:
             return False
@@ -68,7 +75,7 @@ class PatientPage(BasePage):
         """
         try:
             self.driver.find_element(
-                *PatientPageLocators.graph_chart_svg
+                *GRAPH_CHART_SVG
             )
         except NoSuchElementException:
             return False
@@ -81,7 +88,7 @@ class PatientPage(BasePage):
         """
         try:
             self.driver.find_element(
-                *PatientPageLocators.tabular_values_table
+                *TABULAR_VALUES_TABLE
             )
         except NoSuchElementException:
             return False
@@ -94,31 +101,18 @@ class PatientPage(BasePage):
         """
         try:
             self.driver.find_element(
-                *PatientPageLocators.table_container
+                *TABLE_CONTAINER
             )
         except NoSuchElementException:
             return False
         return True
-
-    def change_to_chart(self):
-        """
-        Change the tabs so shows the chart
-        """
-        tab = self.driver.find_element(
-            *PatientPageLocators.graph_tab_button
-        )
-        tab.click()
-        ui.WebDriverWait(self.driver, 5).until(
-            ec.visibility_of_element_located((By.CSS_SELECTOR,
-                                              '#graph-content #chart svg'))
-        )
 
     def change_to_table(self):
         """
         Change the tabs so shows the table
         """
         tab = self.driver.find_element(
-            *PatientPageLocators.table_tab_button
+            *TABLE_TAB_BUTTON
         )
         tab.click()
         ui.WebDriverWait(self.driver, 5).until(
@@ -126,80 +120,13 @@ class PatientPage(BasePage):
                                               '#table-content table'))
         )
 
-    def rangify_control_is_shown(self):
-        """
-        Check that the rangify control is shown
-        :return: Boolean of if the rangify control is shown
-        """
-        try:
-            self.driver.find_element(
-                *PatientPageLocators.rangify_control
-            )
-        except NoSuchElementException:
-            return False
-        return True
-
-    def get_context_graph(self):
-        """
-        Get the context graph element
-        :return: The WebElement of the context graph
-        """
-        return self.driver.find_element(
-            *PatientPageLocators.chart_context_graph
-        )
-
-    def get_focus_graphs(self):
-        """
-        Get the focus graphs of the obs chart
-        :return: A list of focus graph WebElements
-        """
-        return self.driver.find_elements(
-            *PatientPageLocators.chart_focus_graphs
-        )
-
-    @staticmethod
-    def get_graph_label(graph):
-        """
-        Get the label for a graph WebElement
-        :param graph: The graph WebElement to do operation on
-        :return: Label as text
-        """
-        label = graph.find_element(
-            *PatientPageLocators.chart_graph_label
-        )
-        return label.text
-
-    @staticmethod
-    def get_graph_measurement(graph):
-        """
-        Get the measurement for a graph WebElement
-        :param graph: The graph WebElement to do operation on
-        :return: Label as text
-        """
-        measurement = graph.find_element(
-            *PatientPageLocators.chart_graph_measurement
-        )
-        return measurement.text
-
-    @staticmethod
-    def get_graph_measurements(graph):
-        """
-        Get the measurements (as in multiple) for a graph WebElement
-        :param graph: The graph WebElement to do operation on
-        :return: Label as text
-        """
-        measurements = graph.find_elements(
-            *PatientPageLocators.chart_graph_measurement
-        )
-        return measurements
-
     def get_tabular_values(self):
         """
         Get tabular values table
         :return: tabular values WebElement
         """
         return self.driver.find_element(
-            *PatientPageLocators.tabular_values_table
+            *TABULAR_VALUES_TABLE
         )
 
     @staticmethod
@@ -210,7 +137,7 @@ class PatientPage(BasePage):
         :return: A list of table header strings
         """
         headers = table.find_elements(
-            *PatientPageLocators.table_header
+            *TABLE_HEADER
         )
         return [header.text for header in headers]
 
@@ -222,7 +149,7 @@ class PatientPage(BasePage):
         :return: A list of table data strings
         """
         data = table_row.find_elements(
-            *PatientPageLocators.table_data
+            *TABLE_DATA
         )
         return [entry.text for entry in data]
 
@@ -234,7 +161,7 @@ class PatientPage(BasePage):
         :return: A list of table rows
         """
         rows = table.find_elements(
-            *PatientPageLocators.table_row
+            *TABLE_ROW
         )
         return rows
 
@@ -244,10 +171,11 @@ class PatientPage(BasePage):
         :return: tabular values WebElement
         """
         return self.driver.find_element(
-            *PatientPageLocators.table_container
+            *TABLE_CONTAINER
         )
 
-    def select_patient(self, patients):
+    @staticmethod
+    def select_patient(patients):
         """
         Select a patient to observe
         :param patients: a list of patients
@@ -263,11 +191,13 @@ class PatientPage(BasePage):
         self.open_adhoc_obs_menu()
 
         ui.WebDriverWait(self.driver, 5).until(
-            ec.visibility_of_element_located(
-                    (form_id))).click()
+            ec.visibility_of_element_located(form_id)
+        )
+
+        self.driver.find_element(*form_id).click()
 
         ui.WebDriverWait(self.driver, 5).until(
-            ec.visibility_of_element_located((TaskPageLocators.task_form))
+            ec.visibility_of_element_located(TASK_FORM)
         )
 
     def enter_obs_data(self, data):
@@ -275,17 +205,20 @@ class PatientPage(BasePage):
         Enter data into an observation form
         :param data: The data to be entered
         """
-        new_dict = {}
+        if 'oxygen_administration_flag' in data:
+            oxy = self.driver.find_element_by_name(
+                'oxygen_administration_flag')
+            oxy.send_keys(data['oxygen_administration_flag'])
+            oxy.send_keys(Keys.TAB)
+
+            if 'device_id' in data:
+                device = self.driver.find_element_by_name('device_id')
+                device.send_keys(data['device_id'])
+                device.send_keys(Keys.TAB)
 
         for field, value in data.iteritems():
-            if(self.driver.find_element_by_name(field).is_displayed()):
-                input = self.driver.find_element_by_name(field)
-                input.send_keys(value)
-                input.send_keys(Keys.TAB)
-            else:
-                new_dict[field] = value
+            input_field = self.driver.find_element_by_name(field)
+            input_field.send_keys(value)
+            input_field.send_keys(Keys.TAB)
 
-        if new_dict:
-            self.enter_obs_data(new_dict)
-        else:
-            self.driver.find_element(*TaskPageLocators.task_form_submit).click()
+        self.driver.find_element(*TASK_FORM_SUBMIT).click()
